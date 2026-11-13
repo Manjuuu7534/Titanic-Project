@@ -329,6 +329,7 @@ with dashboard_tab:
         hide_index=True
     )
 
+
 # TAB 2: DATA EXPLORER
 
 with explorer_tab:
@@ -372,7 +373,6 @@ with explorer_tab:
             or not selected_sex
             or not selected_survival
         ):
-
             st.warning(
                 "Select at least one value in every filter."
             )
@@ -381,7 +381,7 @@ with explorer_tab:
 
             query = """
             SELECT
-                passengerid,
+                "PassengerId" AS passengerid,
                 name,
                 sex,
                 age,
@@ -398,7 +398,7 @@ with explorer_tab:
                 pclass = ANY(%s)
                 AND sex = ANY(%s)
                 AND survived = ANY(%s)
-            ORDER BY passengerid
+            ORDER BY "PassengerId"
             LIMIT %s
             """
 
@@ -442,21 +442,27 @@ with explorer_tab:
 
     if st.button("Load Staging Table Preview"):
 
-        staging_df = read_query(
-            """
-            SELECT *
-            FROM titanic_project.titanic_staging
-            ORDER BY passengerid
-            LIMIT 20
-            """
-        )
+        try:
 
-        st.dataframe(
-            staging_df,
-            use_container_width=True,
-            hide_index=True
-        )
+            staging_df = read_query(
+                """
+                SELECT *
+                FROM titanic_project.titanic_staging
+                ORDER BY "PassengerId"
+                LIMIT 20
+                """
+            )
 
+            st.dataframe(
+                staging_df,
+                use_container_width=True,
+                hide_index=True
+            )
+
+        except Exception as error:
+
+            st.error("Unable to load staging data.")
+            st.code(str(error))
 
 # =========================================================
 # TAB 3: SQL LAB
